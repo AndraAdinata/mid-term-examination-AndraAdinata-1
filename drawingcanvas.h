@@ -4,43 +4,47 @@
 #include <QWidget>
 #include <QVector>
 #include <QPoint>
-#include <QPainter>
+#include <QRect>
 #include <QMouseEvent>
-#include <iostream>
-#include <iomanip>
-#include <QPixmap>
-#include "CustomMatrix.h"
+#include <QPaintEvent>
+#include <QPainter>
+#include <QImage>
+#include <unordered_map>
 
-using namespace std;
-using Array3x3 = std::array<std::array<bool, 3>, 3>;
+struct CustomMatrix {
+    bool val[3][3];
+    CustomMatrix() { memset(val, 0, sizeof(val)); }
+};
 
-
-class DrawingCanvas : public QWidget
-{
+class DrawingCanvas : public QWidget {
     Q_OBJECT
-private:
-    const int WINDOW_WIDTH=600;
-    const int WINDOW_HEIGHT=400;
-
 public:
     explicit DrawingCanvas(QWidget *parent = nullptr);
 
-    // Slot to clear all points from the canvas
-    void clearPoints();
-    void paintLines();
-    void segmentDetection();
+    // Main function
+    void clearPoints();         // clear every points in canvas
+    void paintLines();          // draw line from points
+    void segmentDetection();    // segmen detector
 
 protected:
-    // Overridden method to handle painting on the widget
+    // For draw and input mouse
     void paintEvent(QPaintEvent *event) override;
-
-    // Overridden method to handle mouse clicks
     void mousePressEvent(QMouseEvent *event) override;
 
 private:
-    // A vector to store all the points drawn by the user
-    QVector<QPoint> m_points;
-
+    QVector<QPoint> m_points;        // points to draw
     bool isPaintLinesClicked = false;
+
+    // Canvas scale
+    const int WINDOW_WIDTH = 800;
+    const int WINDOW_HEIGHT = 600;
+
+    // Detector members
+    QVector<QRect> candidateRects;   // rectangles to draw (purple)
+    int candidateRectSize = 6;       // size of purple rectangle
+
+    // Parameters
+    int min_occurrence = 2;          // frequency threshold for ideal windows
 };
+
 #endif // DRAWINGCANVAS_H
